@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - 'latest-apk.apk'
-      - 'WebUSB-Bridge.apk'
     tags:
       - 'v*'
   workflow_dispatch:
