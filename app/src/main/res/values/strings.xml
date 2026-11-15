@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">WebUSB Bridge</string>
+    <string name="app_subtitle">LOCALHOST ADB &lt;-&gt; WEBSOCKET PACKETIZER</string>
+    <string name="tab_control_panel">Köprü &amp; ADB</string>
+    <string name="tab_browser">WebUSB Tarayıcı</string>
+    <string name="tab_external">Harici / Bookmarklet</string>
+    <string name="tab_logs">Paket Günlüğü</string>
+    <string name="adb_section_title">A. ADB PORT YÖNETİCİSİ (127.0.0.1)</string>
+    <string name="bridge_section_title">B. WEBSOCKET &lt;-&gt; ADB KÖPRÜ SERVİSİ</string>
+    <string name="status_listening">LISTEN (AÇIK)</string>
+    <string name="status_closed">KAPALI / YANIT YOK</string>
+    <string name="status_checking">KONTROL EDİLİYOR...</string>
+    <string name="root_available">SU ERİŞİMİ: MEVCUT</string>
+    <string name="root_unavailable">SU ERİŞİMİ: YOK (MANUEL MOD)</string>
+    <string name="btn_enable_root_adb">Root ile ADB TCP (5555) Aç &amp; Yeniden Başlat</string>
+    <string name="btn_probe_port">Portu Şimdi Yokla</string>
+    <string name="btn_start_bridge">Köprü Servisini Başlat</string>
+    <string name="btn_stop_bridge">Köprü Servisini Durdur</string>
+    <string name="btn_copy_bookmarklet">Bookmarklet Kodunu Kopyala</string>
+    <string name="btn_copy_raw_js">Ham Polyfill JS Kopyala</string>
+    <string name="btn_open_browser">Dahili Tarayıcıda Aç</string>
+    <string name="notification_channel_name">WebUSB Local Bridge Servisi</string>
+    <string name="notification_title">WebUSB Local Bridge Aktif</string>
+    <string name="notification_stop_action">Durdur</string>
+</resources>

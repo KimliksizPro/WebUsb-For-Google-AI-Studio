@@ -1,0 +1,6 @@
+{
+  "name": "WebUSB Bridge",
+  "description": "Localhost WebSocket-to-ADB TCP packetizing bridge and WebUSB polyfill browser for Android.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
