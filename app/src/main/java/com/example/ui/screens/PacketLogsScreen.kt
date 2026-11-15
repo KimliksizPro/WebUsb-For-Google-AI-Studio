@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -47,10 +48,6 @@ import androidx.compose.ui.unit.dp
 import com.example.bridge.BridgeLogEntry
 import com.example.bridge.LogDirection
 import com.example.ui.MainUiState
-import com.example.ui.theme.EmeraldSignal
-import com.example.ui.theme.SignalAmber
-import com.example.ui.theme.SignalRed
-import com.example.ui.theme.TechnicalBlue
 
 private enum class LogFilter(val label: String) {
     ALL("Tümü"),
@@ -91,10 +88,15 @@ fun PacketLogsScreen(
         }
     }
 
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
+            .widthIn(max = 600.dp)
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = 16.dp, vertical = 16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -117,7 +119,7 @@ fun PacketLogsScreen(
                                 else MaterialTheme.colorScheme.surfaceVariant
                             )
                             .clickable { selectedFilter = filter }
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
                     ) {
                         Text(
                             text = filter.label,
@@ -143,28 +145,32 @@ fun PacketLogsScreen(
                         onShowBanner("${filteredLogs.size} kayıt kopyalandı.")
                     },
                     shape = RoundedCornerShape(10.dp),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                    contentPadding = PaddingValues(0.dp),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                    modifier = Modifier.testTag("copy_logs_button")
+                    modifier = Modifier
+                        .size(48.dp)
+                        .testTag("copy_logs_button")
                 ) {
                     Icon(
                         imageVector = Icons.Default.ContentCopy,
                         contentDescription = "Kopyala",
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                 }
 
                 OutlinedButton(
                     onClick = onClearLogs,
                     shape = RoundedCornerShape(10.dp),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                    contentPadding = PaddingValues(0.dp),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                    modifier = Modifier.testTag("clear_logs_button")
+                    modifier = Modifier
+                        .size(48.dp)
+                        .testTag("clear_logs_button")
                 ) {
                     Icon(
                         imageVector = Icons.Default.DeleteSweep,
                         contentDescription = "Temizle",
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
@@ -236,17 +242,18 @@ fun PacketLogsScreen(
             }
         }
     }
+    }
 }
 
 @Composable
 private fun LogRowItem(entry: BridgeLogEntry) {
     val accent = when (entry.direction) {
-        LogDirection.TCP_TO_WS_HEADER -> EmeraldSignal
-        LogDirection.TCP_TO_WS_PAYLOAD -> TechnicalBlue
-        LogDirection.WS_TO_TCP -> SignalAmber
-        LogDirection.ERROR -> SignalRed
-        LogDirection.ROOT -> SignalAmber
-        LogDirection.SYSTEM -> MaterialTheme.colorScheme.primary
+        LogDirection.TCP_TO_WS_HEADER -> MaterialTheme.colorScheme.primary
+        LogDirection.TCP_TO_WS_PAYLOAD -> MaterialTheme.colorScheme.onSurface
+        LogDirection.WS_TO_TCP -> MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)
+        LogDirection.ERROR -> MaterialTheme.colorScheme.error
+        LogDirection.ROOT -> MaterialTheme.colorScheme.primary
+        LogDirection.SYSTEM -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
     Row(

@@ -10,7 +10,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -33,19 +32,21 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Terminal
-import androidx.compose.material.icons.filled.Usb
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -81,9 +82,7 @@ import com.example.ui.MainViewModel
 import com.example.ui.screens.DashboardScreen
 import com.example.ui.screens.ExternalBrowserScreen
 import com.example.ui.screens.PacketLogsScreen
-import com.example.ui.screens.WebUsbBrowserScreen
-import com.example.ui.theme.EmeraldSignal
-import com.example.ui.theme.SignalRed
+import com.example.ui.theme.JetBrainsMonoFontFamily
 import com.example.ui.theme.WebUsbBridgeTheme
 
 class MainActivity : ComponentActivity() {
@@ -114,33 +113,31 @@ class MainActivity : ComponentActivity() {
 private data class NavTabItem(
     val tab: AppTab,
     val label: String,
-    val icon: ImageVector,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
     val testTag: String
 )
 
 private val NAV_ITEMS = listOf(
     NavTabItem(
         tab = AppTab.DASHBOARD,
-        label = "Ana Sayfa",
-        icon = Icons.Default.Home,
+        label = "Kontrol",
+        selectedIcon = Icons.Filled.Home,
+        unselectedIcon = Icons.Outlined.Home,
         testTag = "nav_tab_dashboard"
     ),
     NavTabItem(
-        tab = AppTab.BROWSER,
-        label = "Tarayıcı",
-        icon = Icons.Default.Language,
-        testTag = "nav_tab_browser"
-    ),
-    NavTabItem(
         tab = AppTab.EXTERNAL_MODE,
-        label = "Chrome / Brave",
-        icon = Icons.Default.BookmarkBorder,
+        label = "Tarayıcı Kodu",
+        selectedIcon = Icons.Filled.Code,
+        unselectedIcon = Icons.Outlined.Code,
         testTag = "nav_tab_external"
     ),
     NavTabItem(
         tab = AppTab.LOGS,
         label = "Kayıtlar",
-        icon = Icons.Default.Terminal,
+        selectedIcon = Icons.Filled.Terminal,
+        unselectedIcon = Icons.Outlined.Terminal,
         testTag = "nav_tab_logs"
     )
 )
@@ -173,12 +170,6 @@ fun WebUsbBridgeApp(
         }
     }
 
-    val handleStartBridgeWithPermission = {
-        if (!uiState.bridgeState.isServiceRunning) {
-            handleToggleBridgeWithPermission()
-        }
-    }
-
     val handleShutdownAndExit = {
         viewModel.shutdownEverything {
             activity?.finishAndRemoveTask()
@@ -193,7 +184,7 @@ fun WebUsbBridgeApp(
             containerColor = MaterialTheme.colorScheme.background,
             contentWindowInsets = WindowInsets.safeDrawing,
             topBar = {
-                SimpleTopBar(
+                MinimalTopBar(
                     uiState = uiState,
                     onShutdownEverything = { viewModel.shutdownEverything() },
                     onCycleTheme = viewModel::cycleThemePreference
@@ -215,7 +206,7 @@ fun WebUsbBridgeApp(
                                     onClick = { viewModel.selectTab(item.tab) },
                                     icon = {
                                         Icon(
-                                            imageVector = item.icon,
+                                            imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
                                             contentDescription = item.label,
                                             modifier = Modifier.size(22.dp)
                                         )
@@ -231,9 +222,9 @@ fun WebUsbBridgeApp(
                                         )
                                     },
                                     colors = NavigationBarItemDefaults.colors(
-                                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                        selectedIconColor = MaterialTheme.colorScheme.primary,
                                         selectedTextColor = MaterialTheme.colorScheme.primary,
-                                        indicatorColor = MaterialTheme.colorScheme.primary,
+                                        indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
                                         unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                         unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                                     ),
@@ -255,7 +246,7 @@ fun WebUsbBridgeApp(
                         containerColor = MaterialTheme.colorScheme.surface,
                         modifier = Modifier.fillMaxHeight()
                     ) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         NAV_ITEMS.forEach { item ->
                             val selected = uiState.selectedTab == item.tab
                             NavigationRailItem(
@@ -263,7 +254,7 @@ fun WebUsbBridgeApp(
                                 onClick = { viewModel.selectTab(item.tab) },
                                 icon = {
                                     Icon(
-                                        imageVector = item.icon,
+                                        imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
                                         contentDescription = item.label
                                     )
                                 },
@@ -274,9 +265,9 @@ fun WebUsbBridgeApp(
                                     )
                                 },
                                 colors = NavigationRailItemDefaults.colors(
-                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                    selectedIconColor = MaterialTheme.colorScheme.primary,
                                     selectedTextColor = MaterialTheme.colorScheme.primary,
-                                    indicatorColor = MaterialTheme.colorScheme.primary,
+                                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
                                     unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                     unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                                 ),
@@ -292,7 +283,6 @@ fun WebUsbBridgeApp(
                         AppTab.DASHBOARD -> {
                             DashboardScreen(
                                 uiState = uiState,
-                                quickTargets = viewModel.quickTargets,
                                 onAdbPortChanged = viewModel::onAdbPortInputChanged,
                                 onAdbPortPreset = viewModel::setAdbPortPreset,
                                 onWsPortChanged = viewModel::onWsPortInputChanged,
@@ -304,23 +294,6 @@ fun WebUsbBridgeApp(
                                 onToggleBridgeService = handleToggleBridgeWithPermission,
                                 onShutdownEverything = { viewModel.shutdownEverything() },
                                 onShutdownAndExit = handleShutdownAndExit,
-                                onResetCounters = viewModel::resetCounters,
-                                onOpenUrlInEmbeddedBrowser = viewModel::loadUrlInBrowser,
-                                onNavigateToTab = viewModel::selectTab,
-                                onShowBanner = viewModel::showStatusBanner
-                            )
-                        }
-
-                        AppTab.BROWSER -> {
-                            WebUsbBrowserScreen(
-                                uiState = uiState,
-                                quickTargets = viewModel.quickTargets,
-                                onUrlInputChanged = viewModel::onBrowserUrlInputChanged,
-                                onLoadUrl = viewModel::loadUrlInBrowser,
-                                onPageLoadStateChanged = viewModel::onWebPageLoadStateChanged,
-                                onPolyfillInjected = viewModel::recordPolyfillInjected,
-                                onStartBridgeService = handleStartBridgeWithPermission,
-                                onNavigateBackToDashboard = { viewModel.selectTab(AppTab.DASHBOARD) },
                                 onShowBanner = viewModel::showStatusBanner
                             )
                         }
@@ -350,20 +323,25 @@ fun WebUsbBridgeApp(
                         exit = fadeOut(),
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
-                            .padding(14.dp)
+                            .padding(horizontal = 16.dp, vertical = 14.dp)
                     ) {
                         Box(
                             modifier = Modifier
+                                .widthIn(max = 520.dp)
                                 .fillMaxWidth()
-                                .border(1.dp, EmeraldSignal.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                                .border(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.55f),
+                                    RoundedCornerShape(12.dp)
+                                )
                                 .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
                                 .padding(horizontal = 14.dp, vertical = 12.dp)
                                 .testTag("status_banner")
                         ) {
                             Text(
                                 text = uiState.statusBannerMessage ?: "",
-                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-                                color = EmeraldSignal
+                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -374,24 +352,29 @@ fun WebUsbBridgeApp(
 }
 
 @Composable
-private fun SimpleTopBar(
+private fun MinimalTopBar(
     uiState: MainUiState,
     onShutdownEverything: () -> Unit,
     onCycleTheme: () -> Unit
 ) {
     val isServiceRunning = uiState.bridgeState.isServiceRunning
     val isAdbOpen = uiState.adbProbeResult.status == AdbListenStatus.LISTENING
+    val dotColor = when {
+        isServiceRunning && isAdbOpen -> MaterialTheme.colorScheme.primary
+        isServiceRunning || isAdbOpen -> MaterialTheme.colorScheme.onSurface
+        else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f)
+    }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.statusBars)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(horizontal = 20.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -401,60 +384,50 @@ private fun SimpleTopBar(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(38.dp)
+                        .size(9.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Usb,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                        .background(dotColor)
+                )
                 Spacer(modifier = Modifier.width(10.dp))
-                Column {
-                    Text(
-                        text = "WebUSB Bridge",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = when {
-                            isServiceRunning && isAdbOpen -> "Köprü ve ADB Aktif"
-                            isServiceRunning -> "Köprü Servisi Açık"
-                            isAdbOpen -> "ADB Portu Açık"
-                            else -> "Servis Kapalı"
-                        },
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (isServiceRunning || isAdbOpen) EmeraldSignal else MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                Text(
+                    text = "WebUSB Bridge",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "${uiState.activeWsPort}→${uiState.activeAdbPort}",
+                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = JetBrainsMonoFontFamily),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .background(
+                            MaterialTheme.colorScheme.surfaceVariant,
+                            RoundedCornerShape(6.dp)
+                        )
+                        .padding(horizontal = 7.dp, vertical = 3.dp)
+                )
             }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                // Quick Complete Shutdown Icon Button in Top Bar
-                IconButton(
-                    onClick = onShutdownEverything,
-                    modifier = Modifier
-                        .size(38.dp)
-                        .background(SignalRed.copy(alpha = 0.14f), CircleShape)
-                        .testTag("topbar_shutdown_all_button")
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.PowerSettingsNew,
-                        contentDescription = "Her Şeyi Durdur",
-                        tint = SignalRed,
-                        modifier = Modifier.size(20.dp)
-                    )
+                if (isServiceRunning || isAdbOpen) {
+                    IconButton(
+                        onClick = onShutdownEverything,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .testTag("topbar_shutdown_all_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PowerSettingsNew,
+                            contentDescription = "Her Şeyi Durdur",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
 
                 val (themeIcon, themeLabel) = when (uiState.themePreference) {
@@ -466,15 +439,14 @@ private fun SimpleTopBar(
                 IconButton(
                     onClick = onCycleTheme,
                     modifier = Modifier
-                        .size(38.dp)
-                        .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+                        .size(48.dp)
                         .testTag("theme_toggle_button")
                 ) {
                     Icon(
                         imageVector = themeIcon,
                         contentDescription = themeLabel,
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.size(18.dp)
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }

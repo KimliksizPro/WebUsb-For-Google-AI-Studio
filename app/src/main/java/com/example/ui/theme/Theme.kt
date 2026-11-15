@@ -14,23 +14,23 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
-private val IndustrialDarkColorScheme = darkColorScheme(
-    primary = EmeraldSignal,
-    onPrimary = Color(0xFF042F2E),
-    primaryContainer = EmeraldContainerDark,
-    onPrimaryContainer = Color(0xFFA7F3D0),
-    secondary = TechnicalBlue,
-    onSecondary = Color(0xFF082F49),
-    secondaryContainer = BlueContainerDark,
-    onSecondaryContainer = Color(0xFFBAE6FD),
-    tertiary = SignalAmber,
-    onTertiary = Color(0xFF451A03),
-    tertiaryContainer = AmberContainerDark,
-    onTertiaryContainer = Color(0xFFFDE68A),
-    error = SignalRed,
+private val MinimalBlackRedColorScheme = darkColorScheme(
+    primary = CrimsonRed,
+    onPrimary = Color.White,
+    primaryContainer = CrimsonContainerDark,
+    onPrimaryContainer = Color(0xFFFFD6DB),
+    secondary = Color(0xFFE4E4E7),
+    onSecondary = Color(0xFF09090B),
+    secondaryContainer = DarkSurfaceElevated,
+    onSecondaryContainer = DarkTextPrimary,
+    tertiary = CrimsonRed,
+    onTertiary = Color.White,
+    tertiaryContainer = CrimsonContainerDark,
+    onTertiaryContainer = Color(0xFFFFD6DB),
+    error = CrimsonRed,
     onError = Color.White,
-    errorContainer = RedContainerDark,
-    onErrorContainer = Color(0xFFFECACA),
+    errorContainer = CrimsonContainerDark,
+    onErrorContainer = Color(0xFFFFD6DB),
     background = DarkBackground,
     onBackground = DarkTextPrimary,
     surface = DarkSurface,
@@ -38,26 +38,26 @@ private val IndustrialDarkColorScheme = darkColorScheme(
     surfaceVariant = DarkSurfaceElevated,
     onSurfaceVariant = DarkTextSecondary,
     outline = DarkBorder,
-    outlineVariant = Color(0xFF1E293B)
+    outlineVariant = DarkOutlineSubtle
 )
 
-private val IndustrialLightColorScheme = lightColorScheme(
-    primary = EmeraldSignalDark,
+private val MinimalWhiteRedColorScheme = lightColorScheme(
+    primary = CrimsonRedDark,
     onPrimary = Color.White,
-    primaryContainer = EmeraldContainerLight,
-    onPrimaryContainer = Color(0xFF064E3B),
-    secondary = TechnicalBlueDark,
+    primaryContainer = CrimsonContainerLight,
+    onPrimaryContainer = Color(0xFF7F0016),
+    secondary = Color(0xFF27272A),
     onSecondary = Color.White,
-    secondaryContainer = BlueContainerLight,
-    onSecondaryContainer = Color(0xFF0C4A6E),
-    tertiary = Color(0xFFD97706),
+    secondaryContainer = LightSurfaceElevated,
+    onSecondaryContainer = LightTextPrimary,
+    tertiary = CrimsonRedDark,
     onTertiary = Color.White,
-    tertiaryContainer = AmberContainerLight,
-    onTertiaryContainer = Color(0xFF78350F),
-    error = SignalRedDark,
+    tertiaryContainer = CrimsonContainerLight,
+    onTertiaryContainer = Color(0xFF7F0016),
+    error = CrimsonRedDark,
     onError = Color.White,
-    errorContainer = RedContainerLight,
-    onErrorContainer = Color(0xFF7F1D1D),
+    errorContainer = CrimsonContainerLight,
+    onErrorContainer = Color(0xFF7F0016),
     background = LightBackground,
     onBackground = LightTextPrimary,
     surface = LightSurface,
@@ -65,7 +65,7 @@ private val IndustrialLightColorScheme = lightColorScheme(
     surfaceVariant = LightSurfaceElevated,
     onSurfaceVariant = LightTextSecondary,
     outline = LightBorder,
-    outlineVariant = Color(0xFFE2E8F0)
+    outlineVariant = LightOutlineSubtle
 )
 
 val IndustrialShapes = Shapes(
@@ -81,7 +81,7 @@ fun WebUsbBridgeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) IndustrialDarkColorScheme else IndustrialLightColorScheme
+    val colorScheme = if (darkTheme) MinimalBlackRedColorScheme else MinimalWhiteRedColorScheme
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
