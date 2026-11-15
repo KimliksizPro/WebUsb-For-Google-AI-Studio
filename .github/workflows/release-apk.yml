@@ -2,10 +2,6 @@ name: Release Latest APK
 
 on:
   push:
-    paths:
-      - 'latest-apk.apk'
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
       tag_name:
@@ -23,13 +19,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Verify latest-apk.apk exists
+      - name: Prepare root APK assets
         run: |
-          if [ ! -f "latest-apk.apk" ]; then
-            echo "Error: latest-apk.apk not found in repository root."
+          if [ -f "latest-apk.apk" ]; then
+            cp -f latest-apk.apk WebUSB-Bridge.apk
+          elif [ -f "WebUSB-Bridge.apk" ]; then
+            cp -f WebUSB-Bridge.apk latest-apk.apk
+          else
+            echo "Error: Neither latest-apk.apk nor WebUSB-Bridge.apk found in repository root."
             exit 1
           fi
-          ls -lh latest-apk.apk
+          ls -lh latest-apk.apk WebUSB-Bridge.apk
 
       - name: Determine release tag
         id: meta
@@ -43,10 +43,12 @@ jobs:
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Create GitHub Release with latest-apk.apk
+      - name: Create GitHub Release with APKs
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
           name: "WebUSB Bridge ${{ steps.meta.outputs.tag }}"
-          files: latest-apk.apk
+          files: |
+            latest-apk.apk
+            WebUSB-Bridge.apk
           generate_release_notes: true
