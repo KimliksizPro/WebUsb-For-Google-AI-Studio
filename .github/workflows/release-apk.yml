@@ -1,0 +1,52 @@
+name: Release Latest APK
+
+on:
+  push:
+    paths:
+      - 'latest-apk.apk'
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release etiketi (ör. v1.0.1, boş bırakılırsa otomatik)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify latest-apk.apk exists
+        run: |
+          if [ ! -f "latest-apk.apk" ]; then
+            echo "Error: latest-apk.apk not found in repository root."
+            exit 1
+          fi
+          ls -lh latest-apk.apk
+
+      - name: Determine release tag
+        id: meta
+        run: |
+          if [ -n "${{ github.event.inputs.tag_name }}" ]; then
+            TAG="${{ github.event.inputs.tag_name }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${{ github.ref_name }}"
+          else
+            TAG="v1.0.${{ github.run_number }}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release with latest-apk.apk
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: "WebUSB Bridge ${{ steps.meta.outputs.tag }}"
+          files: latest-apk.apk
+          generate_release_notes: true
